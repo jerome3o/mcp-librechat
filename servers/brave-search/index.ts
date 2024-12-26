@@ -3,6 +3,7 @@
 import express from "express";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { IncomingMessage, ServerResponse } from "http";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -410,6 +411,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
+const activeTransports = new Map<string, SSEServerTransport>();
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -433,13 +436,55 @@ app.get("/sse", (req: express.Request, res: express.Response) => {
 
   // Create transport and connect server
   const transport = new SSEServerTransport("sse", res);
+
+  // Store the transport with its session ID
+  const sessionId = transport.sessionId;
+  activeTransports.set(sessionId, transport);
+
   server.connect(transport);
   transport.start();
 
   // Handle client disconnect
   req.on("close", () => {
+    activeTransports.delete(sessionId);
     transport.close();
   });
+
+  // Log connected client
+  console.log(`Client connected with session ID: ${sessionId}`);
+});
+
+// Add the POST message handler
+app.post("/messages", async (req: express.Request, res: express.Response) => {
+  const sessionId = req.query.session_id as string;
+
+  if (!sessionId) {
+    res.status(400).json({ error: "Missing session_id parameter" });
+    return;
+  }
+
+  const transport = activeTransports.get(sessionId);
+
+  if (!transport) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
+
+  try {
+    await transport.handlePostMessage(req as IncomingMessage, res);
+  } catch (error) {
+    console.error("Error handling POST message:", error);
+    res.status(500).json({ error: "Failed to handle message" });
+  }
+});
+
+// CORS support for the POST endpoint
+app.options("/messages", (req: express.Request, res: express.Response) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "86400"); // 24 hours
+  res.status(204).end();
 });
 
 // Start the server
