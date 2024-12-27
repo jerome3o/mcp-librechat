@@ -435,31 +435,27 @@ app.get("/sse", (req: express.Request, res: express.Response) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   // Create transport and connect server
-  const transport = new SSEServerTransport("sse", res);
+  const transport = new SSEServerTransport("messages", res);
+  console.log(transport.sessionId);
 
   // Store the transport with its session ID
   const sessionId = transport.sessionId;
   activeTransports.set(sessionId, transport);
 
   server.connect(transport);
-  transport.start();
 
   // Handle client disconnect
   req.on("close", () => {
     activeTransports.delete(sessionId);
     transport.close();
   });
-
-  // Log connected client
-  console.log(`Client connected with session ID: ${sessionId}`);
 });
-
 // Add the POST message handler
 app.post("/messages", async (req: express.Request, res: express.Response) => {
-  const sessionId = req.query.session_id as string;
+  const sessionId = req.query.sessionId as string;
 
   if (!sessionId) {
-    res.status(400).json({ error: "Missing session_id parameter" });
+    res.status(400).json({ error: "Missing sessionId parameter" });
     return;
   }
 
@@ -471,7 +467,11 @@ app.post("/messages", async (req: express.Request, res: express.Response) => {
   }
 
   try {
-    await transport.handlePostMessage(req as IncomingMessage, res);
+    console.log("Handling POST message for session ID:", sessionId);
+    console.log(req.body);
+
+    await transport.handlePostMessage(req as IncomingMessage, res, req.body);
+    console.log("Handling POST message for session ID:", sessionId);
   } catch (error) {
     console.error("Error handling POST message:", error);
     res.status(500).json({ error: "Failed to handle message" });

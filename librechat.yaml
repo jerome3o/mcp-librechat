@@ -9,3 +9,5 @@ cache: true
 mcpServers:
   add:
     url: http://mcp-add:8000/sse
+  brave-search:
+    url: http://mcp-brave-search:3000/sse
