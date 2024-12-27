@@ -13,7 +13,7 @@ services:
       context: ./servers/brave-search
       dockerfile: Dockerfile
     environment:
-      - BRAVE_API_KEY={BRAVE_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
 
   # ===============
 
