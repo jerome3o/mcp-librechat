@@ -15,6 +15,11 @@ services:
     environment:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
 
+  mcp-fetch:
+    build:
+      context: ./servers/fetch
+      dockerfile: Dockerfile
+
   # ===============
 
   api:

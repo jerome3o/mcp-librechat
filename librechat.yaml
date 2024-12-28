@@ -11,3 +11,5 @@ mcpServers:
     url: http://mcp-add:8000/sse
   brave-search:
     url: http://mcp-brave-search:3000/sse
+  fetch:
+    url: http://mcp-fetch:8000/sse
