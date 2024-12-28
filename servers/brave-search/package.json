@@ -5,6 +5,7 @@
   "description": "MCP server for Brave Search API integration",
   "license": "MIT",
   "author": "Anthropic, PBC (https://anthropic.com)",
+  "main": "dist/index.js",
   "homepage": "https://modelcontextprotocol.io",
   "bugs": "https://github.com/modelcontextprotocol/servers/issues",
   "bin": {
@@ -14,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "tsc && shx chmod +x dist/src/*.js",
     "prepare": "npm run build",
     "watch": "tsc --watch"
   },
