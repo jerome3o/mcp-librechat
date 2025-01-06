@@ -3,6 +3,14 @@ services:
 
   # MCP servers ===
 
+  mcp-door:
+    build:
+      context: ./servers/door
+      dockerfile: Dockerfile
+    environment:
+      - DOOR_API_KEY=${DOOR_API_KEY}
+      - DOOR_URL=${DOOR_URL}
+
   mcp-add:
     build:
       context: ./servers/add
