@@ -2,6 +2,13 @@ version: "3.8"
 services:
 
   # MCP servers ===
+  mcp-factorio:
+    build:
+      context: ./servers/factorio
+      dockerfile: Dockerfile
+    environment:
+      - FACTORIO_BACKEND_URL=${FACTORIO_BACKEND_URL}
+      - FACTORIO_BACKEND_API_KEY=${FACTORIO_BACKEND_API_KEY}
 
   mcp-door:
     build:

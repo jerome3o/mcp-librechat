@@ -15,3 +15,5 @@ mcpServers:
     url: http://mcp-fetch:8000/sse
   door:
     url: http://mcp-door:8000/sse
+  factorio:
+    url: http://mcp-factorio:8000/sse
